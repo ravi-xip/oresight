@@ -17,3 +17,6 @@ DEFAULT_TEMPERATURE = 0.0
 DEFAULT_MAX_TOKENS = 500
 SYSTEM_PROMPT = "You are an expert marketer who is helping find great prospects for a new product."
 FALLBACK_ANSWER = "I'm sorry, I am not able to answer that question. Please try asking a different request."
+
+# Configurations for the database
+SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
