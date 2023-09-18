@@ -1,10 +1,13 @@
+from datetime import datetime
+
 from sqlalchemy import ForeignKey
 
 from app.database import db
 
 
 class Prospect(db.Model):
-    __tablename__ = 'prospects'
+    __tablename__ = 'prospects' # noqa
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), nullable=False)

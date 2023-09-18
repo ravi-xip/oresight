@@ -4,7 +4,7 @@ from app.database import db
 
 
 class Website(db.Model):
-    __tablename__ = 'websites'
+    __tablename__ = 'websites' # noqa
 
     id = db.Column(db.String(500), primary_key=True)
     name = db.Column(db.String(500), nullable=False)

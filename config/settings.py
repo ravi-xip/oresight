@@ -1,8 +1,7 @@
 # Configurations for the logger
-import logging
+import json
 import logging.config
 import os
-import json
 
 # Load logging configuration from JSON file
 path = os.path.dirname(os.path.abspath(__file__))
@@ -19,4 +18,4 @@ SYSTEM_PROMPT = "You are an expert marketer who is helping find great prospects 
 FALLBACK_ANSWER = "I'm sorry, I am not able to answer that question. Please try asking a different request."
 
 # Configurations for the database
-SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///:memory:")
