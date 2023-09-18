@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "oresight"
+version = "0.1.0"
+description = ""
+authors = ["ravi-xip <ravi@xip.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+beautifulsoup4 = "^4.12.2"
+guidance = "^0.0.64"
+jsonformer = "^0.12.0"
+openai = "^0.28.0"
+langchain = "^0.0.293"
+backoff = "^2.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

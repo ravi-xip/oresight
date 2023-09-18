@@ -1,0 +1,32 @@
+""" Library of all the prompts used by the app. """
+from langchain.prompts import PromptTemplate
+
+BIO_EXTRACTION_PROMPT_TMPL = PromptTemplate.from_template(
+    "Given the following text, extract the information of all the people mentioned in the text.\n"
+    "\n"
+    "\n"
+    "Text: {text}\n"
+    "\n"
+    "\n"
+    "Extract in the following json schema format:\n"
+    "\n"
+    "\n"
+    "```json\n"
+    "{{\n"
+    "  \"people\": [\n"
+    "    {{\n"
+    "      \"name\": \"John Doe\",\n"
+    "      \"title\": \"CEO\",\n"
+    "      \"bio\": \"John Doe is the CEO of ABC. He has been working in the field of AI for 20 years.\"\n"
+    "    }},\n"
+    "    {{\n"
+    "      \"name\": \"Jane Doe\",\n"
+    "      \"title\": \"CTO\",\n"
+    "      \"bio\": \"Jane Doe is the CTO of ABC. She has been working in the field of AI for 20 years.\"\n"
+    "    }}\n"
+    "  ]\n"
+    "}}\n"
+    "```\n"
+    "\n"
+)
+
