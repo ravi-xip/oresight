@@ -9,6 +9,7 @@ class Website(db.Model):
     id = db.Column(db.String(500), primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     url = db.Column(db.String(500), nullable=False)
+    status = db.Column(db.String(500), nullable=False, default='PROCESSING')
     created_at = db.Column(db.TIMESTAMP, server_default='now()', nullable=False)
     updated_at = db.Column(db.TIMESTAMP, server_default='now()', onupdate='now()', nullable=False)
 
