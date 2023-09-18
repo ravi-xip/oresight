@@ -1,6 +1,7 @@
+import logging
+
 from flask import Flask
 from flask_cors import CORS
-from sqlalchemy.testing.plugin.plugin_base import logging
 
 from app.database import db
 from config.settings import SQLALCHEMY_DATABASE_URI
@@ -30,7 +31,7 @@ def start_flask_server():
 
     @app.route('/', methods=['GET'])
     def ping():
-        return "Callosum-Ok", 200
+        return "OreSight-Ok", 200
 
     # Create a route for the root of the app
     @app.route('/health', methods=['GET'])
