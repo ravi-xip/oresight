@@ -1,22 +1,15 @@
-# This is a sample Python script.
+from flask import Flask, jsonify
+from flask_cors import CORS
 
-from llm.aiclient import AIClient
-from reader.file import File
-import logging
-
-
-def extract_bio_example(file_path: str):
-    """
-    This is an example of how to use the AI Client to extract a bio from a file.
-    :param file_path:
-    :return:
-    """
-    contents = File.read(file_path, True)
-    client = AIClient()
-    response = client.extract_bio(contents)
-    logging.info(f"Response: {response}")
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": [ "http://localhost:3000" ]}})
 
 
-# Press the green button in the gutter to run the script.
+@app.route('/')
+def ping():
+    return jsonify({'status': 'ok'})
+
+
 if __name__ == '__main__':
-    extract_bio_example(file_path="data/test.html")
+    # Step I: Run the application.
+    app.run(host='0.0.0.0', port=80, debug=True)

@@ -6,13 +6,13 @@ authors = ["ravi-xip <ravi@xip.co>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 beautifulsoup4 = "^4.12.2"
-guidance = "^0.0.64"
-jsonformer = "^0.12.0"
 openai = "^0.28.0"
 langchain = "^0.0.293"
 backoff = "^2.2.1"
+flask = "^2.3.3"
+flask-cors = "^4.0.0"
 
 
 [build-system]
