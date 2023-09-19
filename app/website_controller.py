@@ -2,12 +2,16 @@ import threading
 
 from sqlalchemy.testing.plugin.plugin_base import logging
 
+from app.database import get_db_session
 from crawler.website_crawler_scrapy import WebSiteCrawlerScrapy
+from repositories.prospect_repository import ProspectRepository
 
 
 class WebsiteController:
     def __init__(self):
         self._crawler = WebSiteCrawlerScrapy()
+        self._session = get_db_session()
+        self._prospect_repository = ProspectRepository(self._session)
 
     def index_website(self, request) -> (str, int):
         """
@@ -49,7 +53,7 @@ class WebsiteController:
         """
         Given a website crawl request, triggers a background task for the website crawler to crawl the website and
         extract its content.
-        
+
         :param request:
         :return:
         """
