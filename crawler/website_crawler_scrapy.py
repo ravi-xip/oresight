@@ -104,9 +104,15 @@ class WebSiteCrawlerScrapy:
             max_links=5,
             download_pdfs=False,
             crawl_filter=site_filter)
-        print(site_results.keys())
 
-
+        Sample of site_results:
+        site_results = {
+            "https://law.justia.com/cases/federal/appellate-courts/ca7/2023/001": "Opinion for Case 2023/001... The court ruled in favor of...",
+            "https://law.justia.com/cases/federal/appellate-courts/ca7/2023/002": "Opinion for Case 2023/002... The appellant failed to demonstrate...",
+            "https://law.justia.com/cases/federal/appellate-courts/ca7/2023/003": "Opinion for Case 2023/003... A unanimous decision by the panel...",
+            "https://law.justia.com/cases/federal/appellate-courts/ca7/2023/004": "Opinion for Case 2023/004... After thorough review, the court...",
+            "https://law.justia.com/cases/federal/appellate-courts/ca7/2023/005": "Opinion for Case 2023/005... The evidences presented were not..."
+        }
         :return: A dictionary mapping url of the page downloaded to content of the page
         """
         # Preprocess the inputs. start_urls should begin with https

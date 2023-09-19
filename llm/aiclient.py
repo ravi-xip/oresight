@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from hashlib import md5
 
 import backoff as backoff
@@ -12,6 +13,7 @@ from config.settings import OPENAI_CHAT_MODEL, DEFAULT_TEMPERATURE, DEFAULT_MAX_
 from llm.conversation.conversation import Conversation
 from llm.prompts.prompts import BIO_EXTRACTION_PROMPT_TMPL
 from llm.util import Utils
+from reader.file import File
 
 
 class AIClient:
@@ -25,15 +27,15 @@ class AIClient:
         self._thor_client = None
         self._openai_client = openai
 
-    def extract_bio(self, contents: str) -> dict:
+    def extract_bio(self, doc_contents: str) -> dict:
         """
         Given the contents of a page (i.e. could be derived from a Webpage), extracts entities from the contents
         These entities are extracted in the format of a JSON dictionary.
 
-        :param contents:
+        :param doc_contents:
         :return:
         """
-        prompt = BIO_EXTRACTION_PROMPT_TMPL.format(text=contents)
+        prompt = BIO_EXTRACTION_PROMPT_TMPL.format(text=doc_contents)
         response = self.__run(prompt)
         try:
             response_json = json.loads(response)
@@ -119,3 +121,15 @@ class AIClient:
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
     def __chat_with_backoff(self, **kwargs):
         return self._openai_client.ChatCompletion.create(**kwargs)
+
+
+if __name__ == '__main__':
+    ai = AIClient()
+    file = File()
+    # Find the path to the base directory
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(base_dir, 'data/test.html')
+    if not os.path.exists(path):
+        raise Exception(f'File {path} does not exist.')
+    contents = file.read(path, normalize=True)
+    print(ai.extract_bio(contents))

@@ -1,7 +1,6 @@
 import logging
 
 from bs4 import BeautifulSoup
-from pyparsing import Optional
 
 from llm.util import Utils
 
