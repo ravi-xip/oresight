@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import func
 
 from app.database import db
@@ -15,10 +17,9 @@ class Website(db.Model):
     updated_at = db.Column(db.TIMESTAMP, server_default='now()', onupdate='now()', nullable=False)
 
     def __init__(self,
-                 id: str,
                  name: str,
                  url: str):
-        self.id = id
+        self.id = uuid.uuid4().hex
         self.name = name
         self.url = url
         self.created_at = func.now()

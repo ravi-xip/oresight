@@ -39,16 +39,12 @@ class ProspectParser:
 
     def __init__(self):
         self._aiclient = AIClient()
-        self._prospect_list: List[Prospect] = []
-
-    @property
-    def prospects(self) -> List[Prospect]:
-        return self._prospect_list
 
     def parse(self, website: Website, url_document_map: Dict[str, str]) -> List[Prospect]:
+        prospect_list: List[Prospect] = []
         for url, document in url_document_map.items():
-            self._prospect_list.extend(self.__parse_document(website, url, document))
-        return self._prospect_list
+            prospect_list.extend(self.__parse_document(website, url, document))
+        return prospect_list
 
     def __parse_document(self, website: Website, url: str, document: str) -> List[Prospect]:
         # Step I: Extract the entities from the document

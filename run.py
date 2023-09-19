@@ -5,7 +5,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 
 from app.database import db
-from app.website_controller import WebsiteController
+from app.controller.website_controller import WebsiteController
 from config.settings import SQLALCHEMY_DATABASE_URI
 
 

@@ -16,3 +16,25 @@ class WebsiteRepository:
 
     def find_all(self):
         return self.session.query(Website).all()
+
+    def update(self, website: Website) -> Website:
+        # Validation check
+        if not website.id or not website.name or not website.url:
+            raise ValueError("Website's id, name, or url cannot be empty")
+
+        # Number of prospects check (should be >=0)
+        if website.num_prospects < 0:
+            raise ValueError("Number of prospects cannot be negative")
+
+        # Check on status (should be one of PROCESSING, COMPLETED, FAILED)
+        if website.status not in ['PROCESSING', 'COMPLETED', 'FAILED']:
+            raise ValueError("Status should be one of PROCESSING, COMPLETED, FAILED")
+
+        # Existence check
+        existing_website = self.session.query(Website).filter_by(id=website.id).first()
+        if not existing_website:
+            raise ValueError(f"Website with id {website.id} does not exist")
+
+        self.session.merge(website)
+        self.session.commit()
+        return website
