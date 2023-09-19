@@ -14,6 +14,7 @@ class Prospect(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     bio = db.Column(db.Text, nullable=True)
     interest = db.Column(db.String(500), nullable=True)
+    url = db.Column(db.String(500), nullable=False)
     website_id = db.Column(db.String(500), ForeignKey("websites.id"), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, server_default='now()', onupdate='now()', nullable=False)
