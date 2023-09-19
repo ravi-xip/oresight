@@ -65,9 +65,6 @@ if __name__ == '__main__':
     Prospect(meta={'id': 2}, name='Jack Done', interest='haha',
                     email='john@doe.com', phone='123456789', bio='John Doe was a great golfer').save()
 
-    # Refresh the index so it is available for search immediately
-    # Prospect._index.refresh()
-
     # Display cluster health
     print(connections.get_connection().cluster.health())
 
