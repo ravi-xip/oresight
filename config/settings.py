@@ -14,6 +14,7 @@ with open(logging_config_file, 'r') as f:
 OPENAI_CHAT_MODEL = "gpt-3.5-turbo-0613"
 DEFAULT_TEMPERATURE = 0.0
 DEFAULT_MAX_TOKENS = 500
+DEFAULT_MAX_LINKS_TO_PARSE = 10
 SYSTEM_PROMPT = "You are an expert marketer who is helping find great prospects for a new product."
 FALLBACK_ANSWER = "I'm sorry, I am not able to answer that question. Please try asking a different request."
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")

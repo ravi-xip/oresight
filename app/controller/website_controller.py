@@ -5,6 +5,7 @@ from flask import Request
 from sqlalchemy.testing.plugin.plugin_base import logging
 
 from app.database import get_db_session
+from config.settings import DEFAULT_MAX_LINKS_TO_PARSE
 from crawler.website_crawler_scrapy import WebSiteCrawlerScrapy
 from entities.prospect import Prospect
 from entities.website import Website
@@ -83,17 +84,19 @@ class WebsiteController:
             raise Exception(f"Invalid URL: {url}")
         start_urls = [url]
         allowed_domains = [domain]
+        max_links = DEFAULT_MAX_LINKS_TO_PARSE
         should_recurse = True
-        max_links = 10
         download_pdfs = False
-        crawl_filter = crawl_filter
 
         # Step II: Trigger the crawler
         crawl_thread = threading.Thread(target=lambda: setattr(crawl_thread, 'response',
                                                                self._crawler.crawl(
-                                                                   start_urls, allowed_domains,
-                                                                   should_recurse, max_links,
-                                                                   download_pdfs, crawl_filter)))
+                                                                   start_urls=start_urls,
+                                                                   allowed_domains=allowed_domains,
+                                                                   should_recurse=should_recurse,
+                                                                   max_links=max_links,
+                                                                   download_pdfs=download_pdfs,
+                                                                   crawl_filter=crawl_filter)))
         crawl_thread.start()
         crawl_thread.join()
 
