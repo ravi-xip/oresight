@@ -16,6 +16,8 @@ DEFAULT_TEMPERATURE = 0.0
 DEFAULT_MAX_TOKENS = 500
 SYSTEM_PROMPT = "You are an expert marketer who is helping find great prospects for a new product."
 FALLBACK_ANSWER = "I'm sorry, I am not able to answer that question. Please try asking a different request."
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_EMBEDDING_MODEL = 'text-embedding-ada-002'
 
 # Configurations for the database
 SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///:memory:")

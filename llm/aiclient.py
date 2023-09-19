@@ -5,8 +5,10 @@ from hashlib import md5
 import backoff as backoff
 
 import openai
+from openai.embeddings_utils import get_embedding
 
-from config.settings import OPENAI_CHAT_MODEL, DEFAULT_TEMPERATURE, DEFAULT_MAX_TOKENS, SYSTEM_PROMPT, FALLBACK_ANSWER
+from config.settings import OPENAI_CHAT_MODEL, DEFAULT_TEMPERATURE, DEFAULT_MAX_TOKENS, SYSTEM_PROMPT, FALLBACK_ANSWER, \
+    OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL
 from llm.conversation.conversation import Conversation
 from llm.prompts.prompts import BIO_EXTRACTION_PROMPT_TMPL
 from llm.util import Utils
@@ -38,6 +40,31 @@ class AIClient:
         except json.JSONDecodeError:
             response_json = {}
         return response_json
+
+    def embedding(self, document: str) -> list[float]:
+        """
+        Given a document, generates an embedding vector for the document.
+        :param document: The document for which the embedding vector needs to be generated.
+        :return: The embedding vector for the document.
+        """
+        # Normalizing the document by replacing \n by spaces
+        document = document.replace('\n', ' ')
+
+        # Step I: Check if the embedding vector is already present in Redis.
+        if self._thor_client and self._thor_client.exists(document):
+            self._hits += 1
+            return self._thor_client.get_array(document)
+
+        # Step II: If not present, then generate the embedding vector and store it in Redis.
+        openai.api_key = OPENAI_API_KEY
+        query_embedding = get_embedding(document, engine=OPENAI_EMBEDDING_MODEL)
+
+        # Step III: Save the embedding vector in Redis.
+        if self._thor_client:
+            self._thor_client.set_array(document, query_embedding)
+
+        # Step IV: Return the embedding vector.
+        return query_embedding
 
     def __run(self, prompt: str) -> str:
         """
@@ -92,5 +119,3 @@ class AIClient:
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
     def __chat_with_backoff(self, **kwargs):
         return self._openai_client.ChatCompletion.create(**kwargs)
-
-
