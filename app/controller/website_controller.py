@@ -13,6 +13,7 @@ from index.propsect_index import ProspectIndex
 from llm.propsect_parser import ProspectParser
 from repositories.prospect_repository import ProspectRepository
 from repositories.website_repository import WebsiteRepository
+from tasks import update_website_status
 
 
 def update_index_with_prospects(prospects: List[Prospect]):
@@ -164,13 +165,13 @@ class WebsiteController:
         logging.info(f"Finished parsing {website.url} and added {len(prospects_added)} prospects")
 
         # Step VI: Update the website status
-        self.__update_website_status(website_id, status="INDEXING", num_prospects=len(prospects_added))
+        update_website_status.delay(website_id, status="INDEXING", num_prospects=len(prospects_added))
 
         # Step VII: Update the index with the prospects
         update_index_with_prospects(prospects_added)
 
         # Step VIII: Update the website status
-        self.__update_website_status(website_id, status="COMPLETED")
+        update_website_status.delay(website_id, status="COMPLETED")
 
         # If debugging is enabled, print the prospects added
         if logging.getLogger().isEnabledFor(logging.DEBUG):
@@ -180,25 +181,3 @@ class WebsiteController:
             logging.debug(f"Finished printing the prospects added")
 
         return prospects_added
-
-    def __update_website_status(self, website_id: str, status: str, num_prospects: int = -1) -> Website:
-        """
-
-        :param website_id:
-        :param status:
-        :param num_prospects:
-        :return:
-        """
-        website = self._website_repository.find_by_id(website_id)
-        if not website:
-            raise ValueError(f"Website with id {website_id} does not exist")
-
-        if status in ['PROCESSING', 'INDEXING', 'COMPLETED', 'FAILED']:
-            website.status = status
-
-        if num_prospects >= 0:
-            website.num_prospects = num_prospects
-
-        website = self._website_repository.update(website)
-        logging.debug(f"Updated website: {website.to_dict()}")
-        return website
