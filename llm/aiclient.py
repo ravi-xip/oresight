@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from hashlib import md5
+from typing import List
 
 import backoff as backoff
 
@@ -11,7 +12,8 @@ from openai.embeddings_utils import get_embedding
 from config.settings import OPENAI_CHAT_MODEL, DEFAULT_TEMPERATURE, DEFAULT_MAX_TOKENS, SYSTEM_PROMPT, FALLBACK_ANSWER, \
     OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL
 from llm.conversation.conversation import Conversation
-from llm.prompts.prompts import BIO_EXTRACTION_PROMPT_TMPL
+from llm.prompts.prompts import BIO_EXTRACTION_PROMPT_TMPL, REDDIT_PROSPECT_CLASSIFIER_PROMPT_TMPL, \
+    REDDIT_PROSPECT_JSON_EXTRACTOR_TMPL, PROSPECT_ANSWER_PROMPT_TMPL
 from llm.util import Utils
 from reader.file import File
 
@@ -42,6 +44,40 @@ class AIClient:
         except json.JSONDecodeError:
             response_json = {}
         return response_json
+
+    def extract_info(self, doc_contents: str) -> dict:
+        """
+        Given the contents of a page (i.e. could be derived from a Webpage), extracts entities from the contents
+        These entities are extracted in the format of a JSON dictionary.
+
+        :param doc_contents:
+        :return:
+        """
+        logging.debug(f'extract_info: doc_contents: {doc_contents}')
+        prompt = REDDIT_PROSPECT_CLASSIFIER_PROMPT_TMPL.format(text=doc_contents)
+        response = self.__run(prompt)
+        prompt_json_extractor = REDDIT_PROSPECT_JSON_EXTRACTOR_TMPL.format(text=response)
+        response_json = self.__run(prompt_json_extractor)
+        logging.debug(f'extract_info: response: {response}')
+        try:
+            response_json = json.loads(response_json)
+            logging.debug(f'extract_info: response_json: {response_json}')
+        except json.JSONDecodeError:
+            logging.error(f'Could not decode response')
+            response_json = {}
+        return response_json
+
+    def explain(self, query: str, conversation: str, chunks: List[str]) -> str:
+        """
+        Given a collection of chunks and a query, generates an explanation for the query.
+        :param query:
+        :param conversation:
+        :param chunks:
+        :return:
+        """
+        prompt = PROSPECT_ANSWER_PROMPT_TMPL.format(prospects=chunks, conversation=conversation, question=query)
+        response = self.__run(prompt)
+        return response
 
     def embedding(self, document: str) -> list[float]:
         """
@@ -128,8 +164,8 @@ if __name__ == '__main__':
     file = File()
     # Find the path to the base directory
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(base_dir, 'data/test.html')
+    path = os.path.join(base_dir, 'data/crawl.txt')
     if not os.path.exists(path):
         raise Exception(f'File {path} does not exist.')
     contents = file.read(path, normalize=True)
-    print(ai.extract_bio(contents))
+    print(ai.extract_info(contents))

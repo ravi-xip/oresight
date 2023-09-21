@@ -147,15 +147,16 @@ class WebSiteCrawlerScrapy:
 
 
 if __name__ == "__main__":
-    site = "https://law.justia.com/cases/federal/appellate-courts/ca7/"
-    domain = "law.justia.com"  # noqa
-    site_filter = "federal/appellate-courts/ca7"
+    site = "https://www.reddit.com/r/BasketballTips/?rdt=53927"
+    domain = "www.reddit.com"  # noqa
+    site_filter = "comments"
     crawler = WebSiteCrawlerScrapy()
     site_results = crawler.crawl(
         start_urls=[site],
         allowed_domains=[domain],
         should_recurse=True,
-        max_links=2,
+        max_links=100,
         download_pdfs=False,
         crawl_filter=site_filter)
     print(site_results.keys())
+    print(site_results.values())

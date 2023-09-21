@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
-
-from sqlalchemy import ForeignKey
+from typing import Optional
 
 from app.database import db
 
@@ -9,20 +8,31 @@ from app.database import db
 class Prospect(db.Model):
     __tablename__ = 'prospects' # noqa
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(20), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
     bio = db.Column(db.Text, nullable=True)
-    interest = db.Column(db.String(500), nullable=True)
     url = db.Column(db.String(500), nullable=False)
-    website_id = db.Column(db.String(500), ForeignKey("websites.id"), nullable=False)
+
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    interest = db.Column(db.String(500), nullable=True)
+    website_id = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.TIMESTAMP, server_default='now()', onupdate='now()', nullable=False)
 
-    def __init__(self, name, email, phone, bio, interest, url, website_id):
+    def __init__(self,
+                 name: Optional[str] = '',
+                 category: Optional[str] = '',
+                 email: Optional[str] = '',
+                 phone: Optional[str] = '',
+                 bio: Optional[str] = '',
+                 interest: Optional[str] = '',
+                 url: Optional[str] = '',
+                 website_id: Optional[str] = ''):
         self.id = uuid.uuid4().hex
         self.name = name
+        self.category = category
         self.email = email
         self.phone = phone
         self.bio = bio

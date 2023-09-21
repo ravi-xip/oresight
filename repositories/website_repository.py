@@ -1,3 +1,5 @@
+from typing import Type
+
 from sqlalchemy.orm import scoped_session
 
 from entities.website import Website
@@ -15,7 +17,16 @@ class WebsiteRepository:
         return website
 
     def find_all(self):
+        # Check if the session is valid
+        if self.session is None:
+            raise Exception("Session is not provided")
         return self.session.query(Website).all()
+
+    def find_by_id(self, website_id: str):
+        # Check if the session is valid
+        if self.session is None:
+            raise Exception("Session is not provided")
+        return self.session.query(Website).filter_by(id=website_id).first()
 
     def update(self, website: Website) -> Website:
         # Validation check
@@ -26,9 +37,9 @@ class WebsiteRepository:
         if website.num_prospects < 0:
             raise ValueError("Number of prospects cannot be negative")
 
-        # Check on status (should be one of PROCESSING, COMPLETED, FAILED)
-        if website.status not in ['PROCESSING', 'COMPLETED', 'FAILED']:
-            raise ValueError("Status should be one of PROCESSING, COMPLETED, FAILED")
+        # Check on status (should be one of PROCESSING, INDEXING, COMPLETED, FAILED)
+        if website.status not in ['PROCESSING', 'INDEXING', 'COMPLETED', 'FAILED']:
+            raise ValueError("Status should be one of PROCESSING, INDEXING, COMPLETED, FAILED")
 
         # Existence check
         existing_website = self.session.query(Website).filter_by(id=website.id).first()

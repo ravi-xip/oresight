@@ -24,9 +24,33 @@ class File:
             except Exception as e:
                 logging.error(f"Error in reading HTML file: {e}")
                 raise e
+        elif path.endswith(".txt"):
+            try:
+                contents = File.read_text(path)
+            except Exception as e:
+                logging.error(f"Error in reading text file: {e}")
+                raise e
+        else:
+            raise Exception(f"File {path} is not a text file or an HTML file")
         if normalize:
             contents = Utils.normalize(contents)
         return contents
+
+    @staticmethod
+    def read_text(path: str) -> str:
+        """
+        Takes path to a text file, reads it and sends it back as a string
+        :param path:
+        :return:
+        """
+        # Step I: Check if the file is a text file
+        if not path.endswith(".txt"):
+            raise Exception("File is not a text file")
+
+        # Step II: Read the contents of the file
+        with open(path, "r") as f:
+            contents = f.read()
+            return contents
 
     @staticmethod
     def read_html(path: str) -> str:
