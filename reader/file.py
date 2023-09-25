@@ -3,6 +3,7 @@ import logging
 from bs4 import BeautifulSoup
 
 from llm.util import Utils
+from pdfminer.high_level import extract_text
 
 
 class File:
@@ -29,6 +30,12 @@ class File:
                 contents = File.read_text(path)
             except Exception as e:
                 logging.error(f"Error in reading text file: {e}")
+                raise e
+        elif path.endswith(".pdf"):
+            try:
+                contents = File.read_pdf(path)
+            except Exception as e:
+                logging.error(f"Error in reading PDF file: {e}")
                 raise e
         else:
             raise Exception(f"File {path} is not a text file or an HTML file")
@@ -78,3 +85,19 @@ class File:
         """
         soup = BeautifulSoup(content, features="html.parser")
         return soup.get_text()
+
+    @staticmethod
+    def read_pdf(file_path: str) -> str:
+        """
+        Takes path to a PDF file, reads it and sends it back as a string
+        :param file_path: Path to the PDF file
+        :return:
+        """
+        return extract_text(file_path)
+
+
+if __name__ == "__main__":
+    file_path = "/Users/ravitandon/Desktop/attention.pdf"
+    contents = File.read(file_path)
+    num_words = len(contents.split(" "))
+    print(f"Number of words: {num_words}")

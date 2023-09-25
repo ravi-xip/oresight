@@ -117,3 +117,12 @@ PROSPECT_ANSWER_PROMPT_TMPL = PromptTemplate.from_template(
     "\n"
     "\n"
 )
+
+SUMMARY_GENERATOR_PROMPT_TMP = PromptTemplate.from_template(
+    "Given the following text and the title, generate a summary of the text.\n"
+    "\n"
+    "\n"
+    "Text: {text}\n"
+    "\n"
+    "\n"
+)

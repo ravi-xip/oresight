@@ -13,7 +13,7 @@ from config.settings import OPENAI_CHAT_MODEL, DEFAULT_TEMPERATURE, DEFAULT_MAX_
     OPENAI_API_KEY, OPENAI_EMBEDDING_MODEL
 from llm.conversation.conversation import Conversation
 from llm.prompts.prompts import BIO_EXTRACTION_PROMPT_TMPL, REDDIT_PROSPECT_CLASSIFIER_PROMPT_TMPL, \
-    REDDIT_PROSPECT_JSON_EXTRACTOR_TMPL, PROSPECT_ANSWER_PROMPT_TMPL
+    REDDIT_PROSPECT_JSON_EXTRACTOR_TMPL, PROSPECT_ANSWER_PROMPT_TMPL, SUMMARY_GENERATOR_PROMPT_TMP
 from llm.util import Utils
 from reader.file import File
 
@@ -28,6 +28,15 @@ class AIClient:
         self._hits = 0
         self._thor_client = None
         self._openai_client = openai
+
+    # Create a setter for model
+    @property
+    def model(self) -> str:
+        return self._model
+    @model.setter
+    def model(self, model: str):
+        self._model = model
+
 
     def extract_bio(self, doc_contents: str) -> dict:
         """
@@ -76,6 +85,16 @@ class AIClient:
         :return:
         """
         prompt = PROSPECT_ANSWER_PROMPT_TMPL.format(prospects=chunks, conversation=conversation, question=query)
+        response = self.__run(prompt)
+        return response
+
+    def summarize(self, doc_contents: str) -> str:
+        """
+        Given a document, generates a summary for the document.
+        :param doc_contents: The document for which the summary needs to be generated.
+        :return:
+        """
+        prompt = SUMMARY_GENERATOR_PROMPT_TMP.format(text=doc_contents)
         response = self.__run(prompt)
         return response
 
