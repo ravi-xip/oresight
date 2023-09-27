@@ -8,7 +8,6 @@ from crawler.utils.helper_methods import get_text_from_html
 
 
 class OreSightDriver:
-
     def __init__(self):
         self._setup_driver()
         self.links_list = []
@@ -23,6 +22,9 @@ class OreSightDriver:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.log_path = "chromedriver.log"
+
         self.driver = webdriver.Chrome(options=chrome_options)
 
     def _navigate_to_page(self, url):
@@ -33,15 +35,17 @@ class OreSightDriver:
         except Exception:
             pass
 
-    def _get_links_from_page_source(self, url: str, page_source: str, filter_text: str) -> list:
-        soup = BeautifulSoup(page_source, 'html.parser')
+    def _get_links_from_page_source(
+        self, url: str, page_source: str, filter_text: str
+    ) -> list:
+        soup = BeautifulSoup(page_source, "html.parser")
 
         self._link_source_map[url] = get_text_from_html(page_source)
 
         links = []
-        for link in soup.find_all('a'):
-            if filter_text in link.get('href', ''):
-                links.append(link.get('href'))
+        for link in soup.find_all("a"):
+            if filter_text in link.get("href", ""):
+                links.append(link.get("href"))
         return links
 
     def _scroll_to_bottom_and_wait(self):
@@ -58,9 +62,8 @@ class OreSightDriver:
         while len(self.links_list) < max_links:
             iteration += 1
             self.links_list += self._get_links_from_page_source(
-                f"{url}_{iteration}",
-                self.driver.page_source,
-                filter_text)
+                f"{url}_{iteration}", self.driver.page_source, filter_text
+            )
 
             # Deduplicate links in case there are repeats
             self.links_list = list(set(self.links_list))
@@ -75,10 +78,12 @@ class OreSightDriver:
         return self._link_source_map
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ore_sight_driver = OreSightDriver()
-    link_source_map = ore_sight_driver.crawl(url="https://www.reddit.com/r/BasketballTips/?rdt=53927",
-                                             max_links=10,
-                                             filter_text="comments")
+    link_source_map = ore_sight_driver.crawl(
+        url="https://www.reddit.com/r/BasketballTips/?rdt=53927",
+        max_links=10,
+        filter_text="comments",
+    )
     for link, source in link_source_map.items():
         print(link, source)

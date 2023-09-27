@@ -57,6 +57,7 @@ services:
     container_name: backend
     environment:
       - ENV=dev
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres:5432
     ports:
       - "8000:8000"
     networks:
