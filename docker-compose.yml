@@ -19,6 +19,7 @@ services:
       - oresight-net
   redis:
     image: redis
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
@@ -27,7 +28,7 @@ services:
       - oresight-net
   postgres:
     image: postgres:14.1-alpine
-    container_name: redis
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
