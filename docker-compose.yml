@@ -38,6 +38,22 @@ services:
       - ./volumes/postgresql:/var/lib/postgresql/data:z
     networks:
       - oresight-net
+  oresight-fe:
+    build:
+      context: ./frontend
+    image: ${DOCKER_HUB_REPO}/oresight-fe:${DOCKER_TAG}
+    environment:
+      - ENV=dev
+    networks:
+      - oresight-net
+  oresight-be:
+    build:
+      context: .
+    image: ${DOCKER_HUB_REPO}/oresight-be:${DOCKER_TAG}
+    environment:
+      - ENV=dev
+    networks:
+      - oresight-net
   nginx:
     image: nginx:latest
     volumes:
