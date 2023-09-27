@@ -9,6 +9,6 @@ declare const ENV: {
 export class Config {
     static getMasterUrl = () => {        
         // Default is development.
-        return "https://ravi-xip.ngrok.io/backend/master";
+        return "https://ravi-xip.ngrok.io/backend/";
     };
 };
