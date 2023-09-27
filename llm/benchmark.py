@@ -12,7 +12,7 @@ class Benchmark:
         self._client = AIClient()
 
     def run(self):
-        """ Triggers the following benchmark. """
+        """Triggers the following benchmark."""
         """
         Make three API calls to the OpenAI server:
         
@@ -28,7 +28,7 @@ class Benchmark:
         # self.__run_chat()
 
     def __run_embed(self):
-        """ Runs the embedding API call. """
+        """Runs the embedding API call."""
         for w_len in [256, 512, 1024, 2048, 4096]:
             start_time = time.time()
             self._client.embedding(" ".join(self._words[:w_len]))
@@ -37,12 +37,12 @@ class Benchmark:
             print("{}, {}, {}".format(self._client.model, w_len, time_taken))
 
     def __run_chat(self):
-        """ Runs the chat API call to OpenAI-3.5. """
+        """Runs the chat API call to OpenAI-3.5."""
         self.__run_chat_3_5()
         self.__run_chat_4_0()
 
     def __run_chat_3_5(self):
-        """ Runs the chat API call. """
+        """Runs the chat API call."""
         # Trigger the call on the client.
         # Word count: 256, 512, 1024, 2048, 4096 words
         # 256 words
@@ -54,7 +54,7 @@ class Benchmark:
             print("{}, {}, {}".format(self._client.model, w_len, time_taken))
 
     def __run_chat_4_0(self):
-        """ Runs the chat API call to OpenAI-4.0. """
+        """Runs the chat API call to OpenAI-4.0."""
         for w_len in [256, 512, 1024, 2048, 4096]:
             start_time = time.time()
             self._client.model = "gpt-4"
