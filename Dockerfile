@@ -1,5 +1,5 @@
 # Use Python 3.11 as the base image
-FROM python:3.11
+FROM python:3.11 AS base
 
 # Set environment variables
 ENV NODE_OPTIONS=--openssl-legacy-provider
@@ -24,13 +24,12 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
 
-# Install Node, Yarn, Cronitor CLI, and chromedriver
-RUN npm install -g yarn && \
-    wget -N $CHROMEDRIVER_URL -P ~/ && \
+# Install Chromedriver
+RUN wget -N $CHROMEDRIVER_URL -P ~/ && \
     unzip ~/chromedriver-linux64.zip -d ~/ && \
     rm ~/chromedriver-linux64.zip && \
     mv -f ~/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
-    chmod 0755 /usr/local/bin/chromedriver
+    chmod +x /usr/local/bin/chromedriver
 
 # Configure and install Poetry
 RUN python3 -m venv $POETRY_VENV && \

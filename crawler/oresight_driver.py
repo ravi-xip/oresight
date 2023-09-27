@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC  # noqa
 from selenium.webdriver.support.ui import WebDriverWait
 
 from crawler.utils.helper_methods import get_text_from_html
@@ -24,15 +24,18 @@ class OreSightDriver:
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.log_path = "chromedriver.log"
-
-        self.driver = webdriver.Chrome(options=chrome_options)
+        remote_url = "http://selenium:4444/wd/hub"  # This is the URL to the selenium service defined in docker-compose
+        self.driver = webdriver.Remote(
+            command_executor=remote_url,
+            options=chrome_options,
+        )
 
     def _navigate_to_page(self, url):
         self.driver.get(url)
         wait = WebDriverWait(self.driver, 5)
         try:
             wait.until(EC.presence_of_element_located((By.CLASS_NAME, "dummy-class")))
-        except Exception:
+        except Exception as e:  # noqa
             pass
 
     def _get_links_from_page_source(
@@ -43,9 +46,9 @@ class OreSightDriver:
         self._link_source_map[url] = get_text_from_html(page_source)
 
         links = []
-        for link in soup.find_all("a"):
-            if filter_text in link.get("href", ""):
-                links.append(link.get("href"))
+        for page_link in soup.find_all("a"):
+            if filter_text in page_link.get("href", ""):
+                links.append(page_link.get("href"))
         return links
 
     def _scroll_to_bottom_and_wait(self):
@@ -53,7 +56,7 @@ class OreSightDriver:
         wait = WebDriverWait(self.driver, 5)
         try:
             wait.until(EC.presence_of_element_located((By.CLASS_NAME, "dummy-class")))
-        except Exception:
+        except Exception as e:  # noqa
             pass
 
     def crawl(self, url: str, max_links: int, filter_text: str) -> dict:
