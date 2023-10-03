@@ -24,11 +24,13 @@ def update_index_with_prospects(prospects: List[Prospect]):
     """
     # Step I: Update the index with the prospects
     for prospect in prospects:
-        ProspectIndex(meta={'id': prospect.id},
-                      name=prospect.name,
-                      bio=prospect.bio,
-                      category=prospect.category,
-                      url=prospect.url).save()
+        ProspectIndex(
+            meta={"id": prospect.id},
+            name=prospect.name,
+            bio=prospect.bio,
+            category=prospect.category,
+            url=prospect.url,
+        ).save()
 
 
 class WebsiteController:
@@ -89,22 +91,30 @@ class WebsiteController:
             return "Missing parameters. name should not be empty.", 400
 
         # Extract name of the website from the request
-        name = request_json.get('name') if request_json.get('name') else ''
-        if name == '':
+        name = request_json.get("name") if request_json.get("name") else ""
+        if name == "":
             return "Missing parameters. name should not be empty.", 400
 
         # Extract URL of the website from the request
-        url = request_json.get('url') if request_json.get('url') else ''
-        if url == '':
+        url = request_json.get("url") if request_json.get("url") else ""
+        if url == "":
             return "Missing parameters. url should not be empty.", 400
 
         # Extract URL filter of the website from the request
-        url_filter = request_json.get('url_filter') if request_json.get('url_filter') else ''
+        url_filter = (
+            request_json.get("url_filter") if request_json.get("url_filter") else ""
+        )
 
-        max_links = request_json.get('max_links') if request_json.get('max_links') else DEFAULT_MAX_LINKS_TO_PARSE
+        max_links = (
+            request_json.get("max_links")
+            if request_json.get("max_links")
+            else DEFAULT_MAX_LINKS_TO_PARSE
+        )
 
         # Create an entry in the database for the website
-        website = Website(name=name, url=url, url_filter=url_filter, max_links=max_links)
+        website = Website(
+            name=name, url=url, url_filter=url_filter, max_links=max_links
+        )
         try:
             website = self._website_repository.add(website)
             # Trigger this in a background thread
@@ -139,9 +149,8 @@ class WebsiteController:
 
         # Step II: Trigger the crawler in a separate thread in the background
         url_content_dict = self._crawler.crawl(
-            url=website.url,
-            max_links=website.max_links,
-            filter_text=website.url_filter)
+            url=website.url, max_links=website.max_links, filter_text=website.url_filter
+        )
 
         # Step III: Extract the results from the crawler
         logging.info(f"Finished crawling {website.url}")
@@ -162,16 +171,20 @@ class WebsiteController:
             except Exception as e:
                 logging.error(f"Error while adding a prospect: {e}")
 
-        logging.info(f"Finished parsing {website.url} and added {len(prospects_added)} prospects")
+        logging.info(
+            f"Finished parsing {website.url} and added {len(prospects_added)} prospects"
+        )
 
         # Step VI: Update the website status
-        update_website_status.delay(website_id, status="INDEXING", num_prospects=len(prospects_added))
+        self._update_website_status(
+            website_id, status="INDEXING", num_prospects=len(prospects_added)
+        )
 
         # Step VII: Update the index with the prospects
         update_index_with_prospects(prospects_added)
 
         # Step VIII: Update the website status
-        update_website_status.delay(website_id, status="COMPLETED")
+        self._update_website_status(website_id, status="COMPLETED")
 
         # If debugging is enabled, print the prospects added
         if logging.getLogger().isEnabledFor(logging.DEBUG):
@@ -181,3 +194,29 @@ class WebsiteController:
             logging.debug(f"Finished printing the prospects added")
 
         return prospects_added
+
+    def _update_website_status(
+        self, website_id: str, status: str, num_prospects: int = -1
+    ) -> Website:
+        """
+        Triggers a background job to update the status of a website.
+
+        :param website_id: This is the id of the website.
+        :param status: This is the status of the website. Possible values are [PROCESSING, INDEXING, COMPLETED, FAILED].
+        :param num_prospects: The total number of prospects found for the website.
+        :return:
+        """
+        website_repository = self._website_repository
+        website = website_repository.find_by_id(website_id)
+        if not website:
+            raise ValueError(f"Website with id {website_id} does not exist")
+
+        if status in ["PROCESSING", "INDEXING", "COMPLETED", "FAILED"]:
+            website.status = status
+
+        if num_prospects >= 0:
+            website.num_prospects = num_prospects
+
+        website = website_repository.update(website)
+        logging.debug(f"Updated website: {website.to_dict()}")
+        return website
