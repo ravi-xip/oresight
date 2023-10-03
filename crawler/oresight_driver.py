@@ -24,11 +24,7 @@ class OreSightDriver:
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.log_path = "chromedriver.log"
-        remote_url = "http://selenium:4444/wd/hub"  # This is the URL to the selenium service defined in docker-compose
-        self.driver = webdriver.Remote(
-            command_executor=remote_url,
-            options=chrome_options,
-        )
+        self.driver = webdriver.Chrome(options=chrome_options)
 
     def _navigate_to_page(self, url):
         self.driver.get(url)
