@@ -60,7 +60,7 @@ services:
       - ENV=dev
       - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres:5432
     ports:
-      - "8000:8000"
+      - "8080:8080"
     networks:
       - oresight-net
     depends_on:
@@ -85,6 +85,34 @@ services:
       - "4444:4444"
     networks:
       - oresight-net
+  worker:
+    build:
+      context: .
+    image: ${DOCKER_HUB_REPO}/oresight-be:${DOCKER_TAG}
+    container_name: worker
+    command: celery -A tasks worker --loglevel=info
+    environment:
+      - ENV=dev
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres:5432
+    networks:
+      - oresight-net
+    depends_on:
+      - postgres
+      - redis
+  beat:
+    build:
+      context: .
+    image: ${DOCKER_HUB_REPO}/oresight-be:${DOCKER_TAG}
+    container_name: beat
+    command: celery -A tasks beat --loglevel=info
+    environment:
+      - ENV=dev
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@postgres:5432
+    networks:
+      - oresight-net
+    depends_on:
+      - postgres
+      - redis
 networks:
   oresight-net:
     driver: bridge

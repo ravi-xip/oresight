@@ -6,12 +6,12 @@ authors = ["ravi-xip <ravi@xip.co>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.5"
+python = "^3.11.5"
 beautifulsoup4 = "^4.12.2"
 openai = "^0.28.0"
-langchain = "0.0.294"
+langchain = "0.0.312"
 backoff = "^2.2.1"
-flask = "^2.3.3"
+flask = "3.0.0"
 flask-cors = "^4.0.0"
 flask-sqlalchemy = "^3.1.1"
 elasticsearch-dsl = "^8.9.0"

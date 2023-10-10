@@ -9,7 +9,7 @@ from crawler.utils.helper_methods import get_text_from_html
 
 class OreSightDriver:
     def __init__(self):
-        self._setup_driver()
+        # self._setup_driver()
         self.links_list = []
         self._link_source_map = {}
 

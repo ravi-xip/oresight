@@ -20,9 +20,10 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
 # Install Python dependencies with Poetry
 COPY poetry.lock pyproject.toml ./
-RUN poetry install
+RUN poetry config virtualenvs.create false && \
+    poetry install
 
 # Copy the rest of the app and set ports and default command
 COPY . .
-EXPOSE 80 443
+EXPOSE 80 443 8080
 CMD [ "poetry", "run", "python", "-m", "run" ]

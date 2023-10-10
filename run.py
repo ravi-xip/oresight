@@ -1,4 +1,5 @@
 import logging
+import time
 import os
 
 from elasticsearch_dsl import connections
@@ -12,6 +13,9 @@ from app.database import db, Session
 from config.settings import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 from index.propsect_index import ProspectIndex
 from middlewares.remove_prefix_middleware import RemovePrefixMiddleware
+
+from elasticsearch_dsl.connections import connections
+from elasticsearch.exceptions import ConnectionError
 
 
 def create_app():
@@ -34,6 +38,29 @@ def create_app():
     return app
 
 
+def connect_to_es(max_retries=5, base_delay=2):
+    """
+    Initialize the Elasticsearch connection and create the index.
+    Uses retries with exponential backoff in case of connection issues.
+    """
+    retries = 0
+
+    while retries < max_retries:
+        try:
+            es_host = os.environ.get("ES_HOST", "elasticsearch")
+            es_port = os.environ.get("ES_PORT", "9200")
+            connections.create_connection(hosts=[f"http://{es_host}:{es_port}"])
+            ProspectIndex.init()
+            return  # Connection successful
+        except ConnectionError:
+            wait_time = base_delay * (2**retries)
+            print(f"Failed to connect to Elasticsearch. Retrying in {wait_time}s...")
+            time.sleep(wait_time)
+            retries += 1
+
+    print(f"Failed to connect to Elasticsearch after {max_retries} attempts.")
+
+
 def start_flask_server():
     """
     Starts the Flask server.
@@ -49,11 +76,7 @@ def start_flask_server():
         website_controller = WebsiteController()
         chat_controller = ChatController()
 
-        # Initialize the Elasticsearch connection and create the index.
-        es_host = os.environ.get("ES_HOST", "localhost")
-        es_port = os.environ.get("ES_PORT", "9200")
-        connections.create_connection(hosts=[f"http://{es_host}:{es_port}"])
-        ProspectIndex.init()
+        connect_to_es()
 
     # Create a route for the root of the app
     @app.route("/", methods=["GET"])
